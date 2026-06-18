@@ -17,8 +17,11 @@ function BookingPage() {
   const { serviceId } = useParams();
   const [service, setService] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [serviceError, setServiceError] = useState("");
   const [formData, setFormData] = useState(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     axios
@@ -29,7 +32,7 @@ function BookingPage() {
         );
 
         if (!selectedService) {
-          setError("الخدمة المطلوبة غير موجودة.");
+          setServiceError("الخدمة المطلوبة غير موجودة.");
           return;
         }
 
@@ -37,7 +40,7 @@ function BookingPage() {
       })
       .catch((requestError) => {
         console.error("Failed to fetch service", requestError);
-        setError("تعذر تحميل بيانات الخدمة.");
+        setServiceError("تعذر تحميل بيانات الخدمة.");
       })
       .finally(() => {
         setIsLoading(false);
@@ -53,14 +56,47 @@ function BookingPage() {
     }));
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setSuccessMessage("");
+    setSubmitError("");
+
+    try {
+      await axios.post("http://localhost:5000/api/appointments", {
+        service: serviceId,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        city: formData.city,
+        mainComplaint: formData.mainComplaint,
+        preferredDate: formData.preferredDate,
+        preferredTime: formData.preferredTime,
+      });
+
+      setSuccessMessage(
+        "تم إرسال طلب الحجز بنجاح. سيتم مراجعته من قبل الطبيبة قبل تأكيد الموعد."
+      );
+      setFormData(initialFormData);
+    } catch (requestError) {
+      console.error("Failed to create appointment", requestError);
+      setSubmitError(
+        "حدث خطأ أثناء إرسال طلب الحجز. يرجى المحاولة مرة أخرى."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isLoading) {
     return <p style={{ padding: "40px", direction: "rtl" }}>جارٍ التحميل...</p>;
   }
 
-  if (error) {
+  if (serviceError) {
     return (
       <div style={{ padding: "40px", direction: "rtl" }}>
-        <p>{error}</p>
+        <p>{serviceError}</p>
         <Link to="/">العودة إلى الخدمات</Link>
       </div>
     );
@@ -96,7 +132,10 @@ function BookingPage() {
         </p>
       </div>
 
-      <form style={{ display: "grid", gap: "16px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "grid", gap: "16px" }}
+      >
         <label>
           الاسم الكامل
           <input
@@ -104,6 +143,7 @@ function BookingPage() {
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -115,6 +155,7 @@ function BookingPage() {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -126,6 +167,7 @@ function BookingPage() {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -137,6 +179,7 @@ function BookingPage() {
             name="country"
             value={formData.country}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -148,6 +191,7 @@ function BookingPage() {
             name="city"
             value={formData.city}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -159,6 +203,7 @@ function BookingPage() {
             value={formData.mainComplaint}
             onChange={handleChange}
             rows="4"
+            required
             style={inputStyle}
           />
         </label>
@@ -170,6 +215,7 @@ function BookingPage() {
             name="preferredDate"
             value={formData.preferredDate}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
@@ -181,12 +227,25 @@ function BookingPage() {
             name="preferredTime"
             value={formData.preferredTime}
             onChange={handleChange}
+            required
             style={inputStyle}
           />
         </label>
 
-        <button type="button" style={{ padding: "12px", cursor: "pointer" }}>
-          تأكيد الحجز
+        {successMessage && (
+          <p style={{ color: "green", margin: 0 }}>{successMessage}</p>
+        )}
+
+        {submitError && (
+          <p style={{ color: "red", margin: 0 }}>{submitError}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{ padding: "12px", cursor: "pointer" }}
+        >
+          {isSubmitting ? "جاري إرسال الطلب..." : "إرسال طلب الحجز"}
         </button>
       </form>
     </div>
