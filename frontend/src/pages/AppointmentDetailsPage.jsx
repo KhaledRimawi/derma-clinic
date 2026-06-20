@@ -7,6 +7,9 @@ function AppointmentDetailsPage() {
   const [appointment, setAppointment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
+  const [updateError, setUpdateError] = useState("");
 
   useEffect(() => {
     axios
@@ -22,6 +25,37 @@ function AppointmentDetailsPage() {
         setIsLoading(false);
       });
   }, [appointmentId]);
+
+  const handleStatusUpdate = async (status) => {
+    setIsUpdating(true);
+    setUpdateMessage("");
+    setUpdateError("");
+
+    try {
+      const response = await axios.patch(
+        `http://localhost:5000/api/appointments/${appointmentId}/status`,
+        { status }
+      );
+
+      setAppointment((currentAppointment) => ({
+        ...currentAppointment,
+        ...response.data,
+        service:
+          currentAppointment.service && response.data.service
+            ? {
+                ...currentAppointment.service,
+                ...response.data.service,
+              }
+            : response.data.service,
+      }));
+      setUpdateMessage("تم تحديث حالة الطلب بنجاح.");
+    } catch (requestError) {
+      console.error("Failed to update appointment status", requestError);
+      setUpdateError("حدث خطأ أثناء تحديث حالة الطلب.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const showValue = (value, fallback = "غير مذكور") => {
     if (value === undefined || value === null || value === "") {
@@ -94,16 +128,50 @@ function AppointmentDetailsPage() {
 
       <h1>تفاصيل طلب الحجز</h1>
 
+      {appointment.status === "pending" && (
+        <section style={sectionStyle}>
+          <h2>إدارة الطلب</h2>
+
+          <div style={actionsStyle}>
+            <button
+              type="button"
+              onClick={() => handleStatusUpdate("approved")}
+              disabled={isUpdating}
+              style={buttonStyle}
+            >
+              قبول الطلب
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleStatusUpdate("rejected")}
+              disabled={isUpdating}
+              style={buttonStyle}
+            >
+              رفض الطلب
+            </button>
+          </div>
+
+          {isUpdating && <p>جاري تحديث الحالة...</p>}
+          {updateMessage && <p style={{ color: "green" }}>{updateMessage}</p>}
+          {updateError && <p style={{ color: "red" }}>{updateError}</p>}
+        </section>
+      )}
+
+      {appointment.status !== "pending" && updateMessage && (
+        <p style={{ color: "green", marginBottom: "20px" }}>{updateMessage}</p>
+      )}
+
+      {appointment.status !== "pending" && updateError && (
+        <p style={{ color: "red", marginBottom: "20px" }}>{updateError}</p>
+      )}
+
       <DetailsSection title="بيانات الخدمة">
         <Detail label="اسم الخدمة" value={service?.name || "غير متوفر"} />
         <Detail label="الوصف" value={service?.description || "غير متوفر"} />
         <Detail
           label="المدة"
-          value={
-            service
-              ? `${service.durationMinutes} دقيقة`
-              : "غير متوفر"
-          }
+          value={service ? `${service.durationMinutes} دقيقة` : "غير متوفر"}
         />
         <Detail
           label="السعر"
@@ -139,10 +207,7 @@ function AppointmentDetailsPage() {
           label="الأدوية الحالية"
           value={showValue(appointment.currentMedications)}
         />
-        <Detail
-          label="الحساسية"
-          value={showValue(appointment.allergies)}
-        />
+        <Detail label="الحساسية" value={showValue(appointment.allergies)} />
         <Detail
           label="هل يوجد حمل أو رضاعة؟"
           value={
@@ -216,6 +281,18 @@ const sectionStyle = {
   borderRadius: "12px",
   padding: "20px",
   marginBottom: "20px",
+};
+
+const actionsStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "12px",
+  marginBottom: "12px",
+};
+
+const buttonStyle = {
+  padding: "10px 18px",
+  cursor: "pointer",
 };
 
 export default AppointmentDetailsPage;

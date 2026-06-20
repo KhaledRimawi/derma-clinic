@@ -110,8 +110,58 @@ const getAppointmentById = async (req, res) => {
   }
 };
 
+const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const allowedStatuses = [
+      "pending",
+      "approved",
+      "rejected",
+      "confirmed",
+      "completed",
+      "cancelled",
+    ];
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid appointment ID",
+      });
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid appointment status",
+      });
+    }
+
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+    await appointment.populate(
+      "service",
+      "name durationMinutes price currency"
+    );
+
+    return res.status(200).json(appointment);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to update appointment status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAppointment,
   getAppointments,
   getAppointmentById,
+  updateAppointmentStatus,
 };
