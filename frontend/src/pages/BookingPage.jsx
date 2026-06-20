@@ -9,6 +9,13 @@ const initialFormData = {
   country: "",
   city: "",
   mainComplaint: "",
+  age: "",
+  gender: "",
+  problemDuration: "",
+  currentMedications: "",
+  allergies: "",
+  pregnancyOrBreastfeeding: "not_applicable",
+  additionalNotes: "",
   preferredDate: "",
   preferredTime: "",
 };
@@ -71,6 +78,13 @@ function BookingPage() {
         country: formData.country,
         city: formData.city,
         mainComplaint: formData.mainComplaint,
+        age: Number(formData.age),
+        gender: formData.gender,
+        problemDuration: formData.problemDuration,
+        currentMedications: formData.currentMedications,
+        allergies: formData.allergies,
+        pregnancyOrBreastfeeding: formData.pregnancyOrBreastfeeding,
+        additionalNotes: formData.additionalNotes,
         preferredDate: formData.preferredDate,
         preferredTime: formData.preferredTime,
       });
@@ -197,6 +211,35 @@ function BookingPage() {
         </label>
 
         <label>
+          العمر
+          <input
+            type="number"
+            name="age"
+            value={formData.age}
+            onChange={handleChange}
+            min="1"
+            required
+            style={inputStyle}
+          />
+        </label>
+
+        <label>
+          الجنس
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          >
+            <option value="">اختر الجنس</option>
+            <option value="male">ذكر</option>
+            <option value="female">أنثى</option>
+            <option value="other">آخر</option>
+          </select>
+        </label>
+
+        <label>
           الشكوى الرئيسية
           <textarea
             name="mainComplaint"
@@ -204,6 +247,65 @@ function BookingPage() {
             onChange={handleChange}
             rows="4"
             required
+            style={inputStyle}
+          />
+        </label>
+
+        <label>
+          مدة المشكلة
+          <input
+            type="text"
+            name="problemDuration"
+            value={formData.problemDuration}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        </label>
+
+        <label>
+          الأدوية الحالية
+          <textarea
+            name="currentMedications"
+            value={formData.currentMedications}
+            onChange={handleChange}
+            rows="3"
+            style={inputStyle}
+          />
+        </label>
+
+        <label>
+          الحساسية
+          <textarea
+            name="allergies"
+            value={formData.allergies}
+            onChange={handleChange}
+            rows="3"
+            style={inputStyle}
+          />
+        </label>
+
+        <label>
+          هل يوجد حمل أو رضاعة؟
+          <select
+            name="pregnancyOrBreastfeeding"
+            value={formData.pregnancyOrBreastfeeding}
+            onChange={handleChange}
+            style={inputStyle}
+          >
+            <option value="not_applicable">لا ينطبق</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </label>
+
+        <label>
+          ملاحظات إضافية
+          <textarea
+            name="additionalNotes"
+            value={formData.additionalNotes}
+            onChange={handleChange}
+            rows="3"
             style={inputStyle}
           />
         </label>

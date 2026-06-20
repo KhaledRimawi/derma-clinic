@@ -45,6 +45,44 @@ const appointmentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    age: {
+      type: Number,
+      required: true,
+    },
+
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+      required: true,
+    },
+
+    problemDuration: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    currentMedications: {
+      type: String,
+      default: "",
+    },
+
+    allergies: {
+      type: String,
+      default: "",
+    },
+
+    pregnancyOrBreastfeeding: {
+      type: String,
+      enum: ["yes", "no", "not_applicable"],
+      default: "not_applicable",
+    },
+
+    additionalNotes: {
+      type: String,
+      default: "",
+    },
+
     preferredDate: {
       type: Date,
       required: true,
