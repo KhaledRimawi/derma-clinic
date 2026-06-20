@@ -80,7 +80,38 @@ const getAppointments = async (req, res) => {
   }
 };
 
+const getAppointmentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid appointment ID",
+      });
+    }
+
+    const appointment = await Appointment.findById(id).populate(
+      "service",
+      "name description durationMinutes price currency"
+    );
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
+
+    return res.status(200).json(appointment);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch appointment",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAppointment,
   getAppointments,
+  getAppointmentById,
 };

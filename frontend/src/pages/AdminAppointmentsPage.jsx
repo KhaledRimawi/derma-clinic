@@ -64,7 +64,7 @@ function AdminAppointmentsPage() {
             style={{
               width: "100%",
               borderCollapse: "collapse",
-              minWidth: "900px",
+              minWidth: "1000px",
             }}
           >
             <thead>
@@ -77,6 +77,7 @@ function AdminAppointmentsPage() {
                 <th style={cellStyle}>الوقت المفضل</th>
                 <th style={cellStyle}>الحالة</th>
                 <th style={cellStyle}>حالة الدفع</th>
+                <th style={cellStyle}>الإجراء</th>
               </tr>
             </thead>
 
@@ -95,6 +96,11 @@ function AdminAppointmentsPage() {
                   <td style={cellStyle}>{appointment.preferredTime}</td>
                   <td style={cellStyle}>{appointment.status}</td>
                   <td style={cellStyle}>{appointment.paymentStatus}</td>
+                  <td style={cellStyle}>
+                    <Link to={`/admin/appointments/${appointment._id}`}>
+                      عرض التفاصيل
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

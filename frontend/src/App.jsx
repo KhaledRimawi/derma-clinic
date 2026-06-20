@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import BookingPage from "./pages/BookingPage";
 import AdminAppointmentsPage from "./pages/AdminAppointmentsPage";
+import AppointmentDetailsPage from "./pages/AppointmentDetailsPage";
 
 function App() {
   return (
@@ -12,6 +13,10 @@ function App() {
         <Route
           path="/admin/appointments"
           element={<AdminAppointmentsPage />}
+        />
+        <Route
+          path="/admin/appointments/:appointmentId"
+          element={<AppointmentDetailsPage />}
         />
       </Routes>
     </BrowserRouter>
