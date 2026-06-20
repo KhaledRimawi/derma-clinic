@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const serviceRoutes = require("./routes/serviceRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({
